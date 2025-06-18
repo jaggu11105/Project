@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ages Quiz - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 12px 20px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #2de60f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      font-size: 42px;
+      font-weight: bold;
+      color: #39ff14;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #39ff14;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .menu-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .quiz-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(57, 255, 20, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      border-color: rgba(57, 255, 20, 0.6);
+      box-shadow: 0 8px 25px rgba(57, 255, 20, 0.2);
+    }
+
+    .formula-section h2 {
+      color: #39ff14;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .formula-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+    }
+
+    .formula-item {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid #39ff14;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .formula-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    .question {
+      margin-bottom: 25px;
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .question-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 12px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .options label:hover {
+      background-color: rgba(57, 255, 20, 0.1);
+      transform: translateX(5px);
+    }
+
+    .options input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: #39ff14;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .bottom-btn {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .explanation {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .score-header {
+      text-align: center;
+      font-size: 36px;
+      color: #39ff14;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px #39ff14;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .result-item {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .correct {
+      border-left-color: #39ff14;
+      background-color: rgba(57, 255, 20, 0.05);
+    }
+
+    .incorrect {
+      border-left-color: #ff4444;
+      background-color: rgba(255, 68, 68, 0.05);
+    }
+
+    .user-answer {
+      color: #ff9999;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #99ff99;
+      font-weight: bold;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #39ff14, #2de60f);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <!-- Menu Page -->
+    <div id="menuPage">
+      <div class="header">🧮 Ages - Problem Solving</div>
+      <div class="menu-container">
+        <div class="formula-section">
+          <h2>📋 Age Problem Formulas & Concepts</h2>
+          <div class="formula-list">
+            <div class="formula-item">Present Age: A = Current age of person A</div>
+            <div class="formula-item">Future Age: A + n = Age after n years</div>
+            <div class="formula-item">Past Age: A - n = Age n years ago</div>
+            <div class="formula-item">Sum of Ages: A + B + C = Total age</div>
+            <div class="formula-item">Average Age: (A + B + C) / 3</div>
+            <div class="formula-item">Age Ratio: A : B = x : y</div>
+            <div class="formula-item">Age Difference: |A - B| = Constant</div>
+            <div class="formula-item">Father's Age = Mother's Age ± difference</div>
+            <div class="formula-item">If A is n times B: A = n × B</div>
+            <div class="formula-item">Age after/before ratio: (A±n)/(B±n)</div>
+            <div class="formula-item">Family Average: Total Age / Members</div>
+            <div class="formula-item">Generation Gap: Usually 20-30 years</div>
+          </div>
+        </div>
+        
+        <div class="nav-buttons">
+          <button onclick="showQuiz()">🎯 Start Quiz</button>
+          <button onclick="showFormulas()">📚 View All Formulas</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulas Page -->
+    <div id="formulasPage" class="hidden">
+      <div class="header">📐 Age Problem Formulas</div>
+      <div class="quiz-container">
+        <div class="formula-section">
+          <h2>🔢 Basic Age Relationships</h2>
+          <div class="formula-list">
+            <div class="formula-item">Present Age: A (current age)</div>
+            <div class="formula-item">Age after n years: A + n</div>
+            <div class="formula-item">Age n years ago: A - n</div>
+            <div class="formula-item">Age difference remains constant: A - B = constant</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>📊 Ratio and Proportion</h2>
+          <div class="formula-list">
+            <div class="formula-item">Age ratio: A : B = x : y → A = kx, B = ky</div>
+            <div class="formula-item">Future ratio: (A+n) : (B+n)</div>
+            <div class="formula-item">Past ratio: (A-n) : (B-n)</div>
+            <div class="formula-item">Cross multiplication: A/B = x/y → Ay = Bx</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>👨‍👩‍👧‍👦 Family Age Problems</h2>
+          <div class="formula-list">
+            <div class="formula-item">Sum of family ages: ΣAges = A₁ + A₂ + ... + Aₙ</div>
+            <div class="formula-item">Average family age: ΣAges / n</div>
+            <div class="formula-item">Father's age = Son's age + Generation gap</div>
+            <div class="formula-item">Mother's age = Daughter's age + Generation gap</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>🧮 Multiple Relationships</h2>
+          <div class="formula-list">
+            <div class="formula-item">A is n times B: A = n × B</div>
+            <div class="formula-item">A is B + n years: A = B + n</div>
+            <div class="formula-item">Combined age problems: Use simultaneous equations</div>
+            <div class="formula-item">Time-based changes: Account for same time passage</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-btn">
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+      </div>
+    </div>
+    
+    <!-- Quiz Page -->
+    <div id="quizPage" class="hidden">
+      <div class="header">🎯 Ages Quiz</div>
+      <div class="timer" id="timer">Time Left: 10:00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <form id="quizForm" class="quiz-container"></form>
+      <div class="button-group">
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+        <button onclick="submitQuiz()" style="background-color: #ff6b35;">📝 Submit Quiz</button>
+      </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="hidden">
+      <div id="scoreDisplay" class="score-header"></div>
+      <div class="quiz-container">
+        <div id="results"></div>
+      </div>
+      <div class="button-group">
+        <button onclick="restartQuiz()">🔄 Retake Quiz</button>
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+        <button onclick="showFormulas()">📚 Review Formulas</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. The sum of ages of A and B is 45. After 5 years, their ages will be in ratio 5:4. Find B's present age.",
+        options: ["20 years", "25 years", "18 years", "15 years"],
+        answer: "20 years",
+        explanation: "Let A = x, B = y. Given: x + y = 45 and (x+5)/(y+5) = 5/4. Cross multiply: 4(x+5) = 5(y+5) → 4x + 20 = 5y + 25 → 4x - 5y = 5. From first equation: x = 45 - y. Substitute: 4(45-y) - 5y = 5 → 180 - 4y - 5y = 5 → 175 = 9y → y = 19.44 ≈ 20"
+      },
+      {
+        question: "2. A is twice as old as B. 10 years ago, A was three times as old as B. Find B's current age.",
+        options: ["20 years", "30 years", "40 years", "10 years"],
+        answer: "20 years",
+        explanation: "Let B's current age = x, then A's current age = 2x. 10 years ago: A was (2x-10) and B was (x-10). Given: 2x - 10 = 3(x - 10) → 2x - 10 = 3x - 30 → 20 = x. So B is 20 years old."
+      },
+      {
+        question: "3. Average age of a family of 5 is 30. If the age of the youngest member is 10, what is the average age of the remaining 4?",
+        options: ["35 years", "40 years", "32.5 years", "37.5 years"],
+        answer: "35 years",
+        explanation: "Total age of 5 members = 5 × 30 = 150 years. Youngest member's age = 10 years. Total age of remaining 4 = 150 - 10 = 140 years. Average age of remaining 4 = 140 ÷ 4 = 35 years."
+      },
+      {
+        question: "4. Father's age is three times his son's age. After 12 years, father will be twice as old as his son. Find the son's present age.",
+        options: ["12 years", "15 years", "18 years", "10 years"],
+        answer: "12 years",
+        explanation: "Let son's current age = x, father's current age = 3x. After 12 years: son = x+12, father = 3x+12. Given: 3x + 12 = 2(x + 12) → 3x + 12 = 2x + 24 → x = 12. Son is 12 years old."
+      },
+      {
+        question: "5. The ages of A, B, and C are in ratio 2:3:4. After 5 years, the ratio becomes 3:4:5. Find A's present age.",
+        options: ["10 years", "15 years", "20 years", "25 years"],
+        answer: "10 years",
+        explanation: "Let current ages be 2k, 3k, 4k. After 5 years: (2k+5):(3k+5):(4k+5) = 3:4:5. Taking first two ratios: (2k+5)/(3k+5) = 3/4 → 4(2k+5) = 3(3k+5) → 8k+20 = 9k+15 → k = 5. So A's age = 2k = 10 years."
+      },
+      {
+        question: "6. A mother is 21 years older than her child. In 6 years, the mother will be 5 times as old as the child. How old is the child now?",
+        options: ["3 years", "4 years", "5 years", "2 years"],
+        answer: "3 years",
+        explanation: "Let child's current age = x, mother's current age = x + 21. After 6 years: child = x+6, mother = x+27. Given: x + 27 = 5(x + 6) → x + 27 = 5x + 30 → -3 = 4x → x = 3. Child is 3 years old."
+      },
+      {
+        question: "7. A is 5 years older than B. 5 years ago, A was twice as old as B. What are their current ages?",
+        options: ["A: 15, B: 10", "A: 20, B: 15", "A: 12, B: 7", "A: 18, B: 13"],
+        answer: "A: 15, B: 10",
+        explanation: "Let B's current age = x, A's current age = x + 5. 5 years ago: A was (x), B was (x-5). Given: x = 2(x - 5) → x = 2x - 10 → x = 10. So B = 10, A = 15."
+      },
+      {
+        question: "8. The ratio of ages of father and son is 7:2. After 10 years, the ratio will be 9:4. Find their present ages.",
+        options: ["Father: 35, Son: 10", "Father: 42, Son: 12", "Father: 28, Son: 8", "Father: 49, Son: 14"],
+        answer: "Father: 35, Son: 10",
+        explanation: "Let current ages be 7k and 2k. After 10 years: (7k+10):(2k+10) = 9:4. So (7k+10)/(2k+10) = 9/4 → 4(7k+10) = 9(2k+10) → 28k+40 = 18k+90 → 10k = 50 → k = 5. Father = 35, Son = 10."
+      },
+      {
+        question: "9. Six years ago, the ratio of ages of A and B was 6:5. Four years hence, the ratio will be 11:10. Find B's present age.",
+        options: ["16 years", "18 years", "20 years", "22 years"],
+        answer: "16 years",
+        explanation: "Let current ages be x and y. Six years ago: (x-6):(y-6) = 6:5 → 5(x-6) = 6(y-6) → 5x-30 = 6y-36 → 5x-6y = -6. Four years hence: (x+4):(y+4) = 11:10 → 10(x+4) = 11(y+4) → 10x+40 = 11y+44 → 10x-11y = 4. Solving: x = 18, y = 16."
+      },
+      {
+        question: "10. The sum of ages of husband and wife is 60. 4 years ago, the ratio of their ages was 7:6. Find the wife's current age.",
+        options: ["28 years", "30 years", "32 years", "26 years"],
+        answer: "28 years",
+        explanation: "Let current ages be H and W. Given: H + W = 60. Four years ago: (H-4):(W-4) = 7:6 → 6(H-4) = 7(W-4) → 6H-24 = 7W-28 → 6H-7W = -4. From first equation: H = 60-W. Substitute: 6(60-W)-7W = -4 → 360-6W-7W = -4 → 364 = 13W → W = 28."
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+    const resultsDiv = document.getElementById("results");
+    const timerDisplay = document.getElementById("timer");
+    const progressFill = document.getElementById("progressFill");
+    const menuPage = document.getElementById("menuPage");
+    const formulasPage = document.getElementById("formulasPage");
+    const quizPage = document.getElementById("quizPage");
+    const resultsPage = document.getElementById("resultsPage");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    
+    let timeLeft = 10 * 60;
+    let timerInterval;
+    let userAnswers = {};
+
+    function showMenu() {
+      hideAllPages();
+      menuPage.classList.remove("hidden");
+    }
+
+    function showFormulas() {
+      hideAllPages();
+      formulasPage.classList.remove("hidden");
+    }
+
+    function showQuiz() {
+      hideAllPages();
+      quizPage.classList.remove("hidden");
+      renderQuiz();
+      startTimer();
+    }
+
+    function hideAllPages() {
+      menuPage.classList.add("hidden");
+      formulasPage.classList.add("hidden");
+      quizPage.classList.add("hidden");
+      resultsPage.classList.add("hidden");
+    }
+
+    function renderQuiz() {
+      quizForm.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `
+          <div class="question-text">${q.question}</div>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}" />
+                ${opt}
+              </label>`).join("")}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(userAnswers).length;
+      const progress = (answered / questions.length) * 100;
+      progressFill.style.width = progress + '%';
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 10 * 60;
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `⏱️ Time Left: ${minutes}:${seconds}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    // Track answers in real time
+    document.addEventListener('change', function(e) {
+      if (e.target.type === 'radio') {
+        const questionIndex = e.target.name.replace('q', '');
+        userAnswers[questionIndex] = e.target.value;
+        updateProgress();
+      }
+    });
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      
+      // Collect any remaining answers
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name=q${index}]:checked`);
+        if (selected && !userAnswers[index]) {
+          userAnswers[index] = selected.value;
+        }
+      });
+
+      hideAllPages();
+      resultsPage.classList.remove("hidden");
+      displayResults();
+    }
+
+    function displayResults() {
+      let score = 0;
+      let resultsHTML = "";
+
+      questions.forEach((q, index) => {
+        const userAns = userAnswers[index] || "Not Answered";
+        const correct = q.answer === userAns;
+        if (correct) score++;
+
+        resultsHTML += `
+          <div class="result-item ${correct ? 'correct' : 'incorrect'}">
+            <div class="question-text">${q.question}</div>
+            <p><strong>Your Answer:</strong> <span class="user-answer">${userAns}</span></p>
+            <p><strong>Correct Answer:</strong> <span class="correct-answer">${q.answer}</span></p>
+            <div class="explanation"><strong>Explanation:</strong> ${q.explanation}</div>
+          </div>
+        `;
+      });
+
+      const percentage = Math.round((score / questions.length) * 100);
+      let grade = "";
+      if (percentage >= 90) grade = "🏆 Excellent!";
+      else if (percentage >= 80) grade = "🎯 Great Job!";
+      else if (percentage >= 70) grade = "👍 Good Work!";
+      else if (percentage >= 60) grade = "📚 Keep Practicing!";
+      else grade = "💪 Don't Give Up!";
+
+      scoreDisplay.innerHTML = `${grade}<br>Score: ${score}/${questions.length} (${percentage}%)`;
+      resultsDiv.innerHTML = resultsHTML;
+    }
+
+    function restartQuiz() {
+      timeLeft = 10 * 60;
+      userAnswers = {};
+      quizForm.innerHTML = "";
+      progressFill.style.width = '0%';
+      
+      hideAllPages();
+      quizPage.classList.remove("hidden");
+      renderQuiz();
+      startTimer();
+    }
+
+    // Background animation
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    const formulas = [
+      "A + B = 45", "2A = B", "A:B = 3:2", "A - 5", "A + 10", "Age/3", 
+      "x + y", "2x - 10", "3(x-5)", "A/B = 5/4", "∑Ages", "μ age", 
+      "A = 2B", "A - B = k", "A:B:C", "5x + 3y", "Father > Son", "Years"
+    ];
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 60 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 0.8 + Math.random() * 1.5,
+        size: 12 + Math.random() * 8,
+        opacity: 0.3 + Math.random() * 0.4
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px 'Courier New', monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+        p.y += p.speedY;
+        if (p.y > canvas.height + 50) {
+          p.y = -50;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    // Initialize
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

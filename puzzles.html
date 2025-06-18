@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ages - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+
+    h2 {
+      color: #39ff14;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <a href="topics.html"><button>🢀</button></a>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <div class="header">Aptitude Formulas</div>
+    <div class="content">
+
+      <div class="formula-section">
+        <h2>1️⃣ Matrix-based Logic Puzzles</h2>
+        <ul>
+          <li>Create a matrix (table) with categories as rows and columns.</li>
+          <li>Use "✓" for true and "×" for false to eliminate possibilities.</li>
+          <li>Apply direct and indirect clues logically and iteratively.</li>
+          <li>Use the process of elimination to narrow down options.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>2️⃣ Complex Seating Arrangements</h2>
+        <ul>
+          <li>Define consistent direction: Clockwise or Counterclockwise.</li>
+          <li>Facing Center ⇒ Left = counterclockwise; Facing Outward ⇒ Left = clockwise.</li>
+          <li>"A is second to the right of B" ⇒ Skip one person in between.</li>
+          <li>Use diagrams and placeholder names (P1, P2...) during placement.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>3️⃣ Floor/Age-based Logical Sequences</h2>
+        <ul>
+          <li>Assign highest floor as n, and descend to 1.</li>
+          <li>"A lives above B" ⇒ Floor(A) > Floor(B).</li>
+          <li>Use notation: Age(A) = Age(B) + x | Floor(A) = Floor(B) + x</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>4️⃣ Blood Relation Puzzles</h2>
+        <ul>
+          <li>Basic Terms: Father's son = brother; Mother's brother = maternal uncle</li>
+          <li>Symbolic codes: A + B = A is father of B; A × B = A is brother of B</li>
+          <li>Use diagrams to draw family trees and decode complex chains.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>5️⃣ Direction Sense Puzzles</h2>
+        <ul>
+          <li>Left = 90° anti-clockwise, Right = 90° clockwise, Opposite = 180°</li>
+          <li>Direction flow: North → Right = East → Right = South, etc.</li>
+          <li>Displacement = √(x² + y²) for x North and y East.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>6️⃣ Scheduling / Day-based Puzzles</h2>
+        <ul>
+          <li>Create 7-column table (Mon–Sun).</li>
+          <li>"X happens 2 days after Y" ⇒ Count forward.</li>
+          <li>"No event between A and B" ⇒ Use gap-based reasoning.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>7️⃣ Binary / Number Logic Puzzles</h2>
+        <ul>
+          <li>Use variables: A = x, B = x+2 for relative values.</li>
+          <li>If total sum is given: A + B + C = total</li>
+          <li>Apply plug-in method or eliminate invalid sets.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>8️⃣ Ranking / Position Puzzles</h2>
+        <ul>
+          <li>Total = Rank from Left + Rank from Right - 1</li>
+          <li>Middle = (First + Last)/2</li>
+          <li>Use vertical lists or number lines to map positions.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>9️⃣ Group / Team Formation Logic</h2>
+        <ul>
+          <li>Conditions: A ∧ B (together), A ⊕ B (either/or), exclusions.</li>
+          <li>Form all valid sets and eliminate based on constraints.</li>
+          <li>Use shorthand notations and logic gates effectively.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+  <div class="bottomright"><button><a href="puzzles1.html">Attend Test</a></button></div>
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

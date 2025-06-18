@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analogies Quiz - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      font-size: 36px;
+      font-weight: bold;
+      color: #39ff14;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .quiz-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #39ff14;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .bottom-btn {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .explanation {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <div class="header">📚 Logic Puzzles Quiz</div>
+    <div class="timer" id="timer">Time Left: 10:00</div>
+    <form id="quizForm" class="quiz-container"></form>
+    <div class="results" id="results"></div>
+    <div class="bottom-btn">
+      <button onclick="location.href='Puzzles.html'">Back</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. You are given a 4x4 matrix where each row and column must contain the numbers 1 to 4 exactly once. The sum of each row and column is known. Clue: Cell (1, A) is odd. Which number should be placed in cell (1, A)?",
+        options: ["1", "3", "2", "4"],
+        answer: "1",
+        explanation: "Cell (1, A) must be odd, so it can be either 1 or 3. Given the constraints, 1 is the correct choice."
+      },
+      {
+        question: "2. In the same 4x4 matrix, Clue: Cell (2, B) is even. Which number should be placed in cell (2, B)?",
+        options: ["2", "4", "1", "3"],
+        answer: "2",
+        explanation: "Cell (2, B) must be even, so it can be either 2 or 4. Given the constraints, 2 is the correct choice."
+      },
+      {
+        question: "3. Eight people—Alex, Blake, Casey, Dana, Erin, Fiona, George, and Henry—are sitting around a circular table, facing the center. Clue: Henry is to the immediate left of George. Who is sitting to the immediate right of George?",
+        options: ["Alex", "Blake", "Casey", "Dana", "Erin", "Fiona", "Henry"],
+        answer: "Henry",
+        explanation: "Henry is to the immediate left of George, so Henry must be sitting to the immediate right of George."
+      },
+      {
+        question: "4. In the same arrangement, who is sitting directly opposite Erin?",
+        options: ["Alex", "Blake", "Casey", "Dana", "Fiona", "George", "Henry"],
+        answer: "Casey",
+        explanation: "Based on the arrangement, Casey is sitting directly opposite Erin."
+      },
+      {
+        question: "5. Five people—Tom, Jerry, Alice, Bob, and Cindy—live on different floors (1 to 5) and have different ages. Clue: The person on the 2nd floor is 22 years old. Who lives on the second floor?",
+        options: ["Tom", "Jerry", "Alice", "Bob", "Cindy"],
+        answer: "Alice",
+        explanation: "Alice is 22 years old and lives on the second floor."
+      },
+      {
+        question: "6. In the same setup, who is the oldest person?",
+        options: ["Tom", "Jerry", "Alice", "Bob", "Cindy"],
+        answer: "Bob",
+        explanation: "Bob is the oldest person."
+      },
+      {
+        question: "7. You are given a 3x3 matrix where each row and column must contain the numbers 1 to 3 once. Clue: Cell (1, A) is odd. Which number should be placed in cell (1, A)?",
+        options: ["1", "3", "2"],
+        answer: "1",
+        explanation: "Cell (1, A) must be odd, so it can be either 1 or 3. Given the constraints, 1 is the correct choice."
+      },
+      {
+        question: "8. In the same 3x3 matrix, Clue: Cell (2, B) is even. Which number should be placed in cell (2, B)?",
+        options: ["2", "1", "3"],
+        answer: "2",
+        explanation: "Cell (2, B) must be even, so it can be either 2. Given the constraints, 2 is the correct choice."
+      },
+      {
+        question: "9. Six people—Anna, Ben, Clara, Dave, Ellie, and Frank—are sitting around a table, facing the center. Clue: Frank is to the immediate left of Clara. Who is sitting to the immediate right of Frank?",
+        options: ["Anna", "Ben", "Clara", "Dave", "Ellie"],
+        answer: "Clara",
+        explanation: "Frank is to the immediate left of Clara, so Clara must be sitting to the immediate right of Frank."
+      },
+      {
+        question: "10. In the same arrangement, who is sitting directly opposite Ellie?",
+        options: ["Anna", "Ben", "Clara", "Dave", "Frank"],
+        answer: "Dave",
+        explanation: "Based on the arrangement, Dave is sitting directly opposite Ellie."
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+    const resultsDiv = document.getElementById("results");
+    const timerDisplay = document.getElementById("timer");
+    let timeLeft = 10 * 60;
+    let timerInterval;
+
+    function renderQuiz() {
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `
+          <p>${q.question}</p>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}" />
+                ${opt}
+              </label>`).join("")}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+
+      const submitBtn = document.createElement("button");
+      submitBtn.textContent = "Submit";
+      submitBtn.type = "button";
+      submitBtn.onclick = submitQuiz;
+      quizForm.appendChild(submitBtn);
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `Time Left: ${minutes}:${seconds}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      let score = 0;
+      resultsDiv.innerHTML = "<h3>Results:</h3>";
+
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name=q${index}]:checked`);
+        const userAns = selected ? selected.value : "Not Answered";
+        const correct = q.answer === userAns;
+        if (correct) score++;
+
+        resultsDiv.innerHTML += `
+          <p><strong>${q.question}</strong><br/>
+          Your Answer: ${userAns}<br/>
+          Correct Answer: ${q.answer}<br/>
+          <span class="explanation">Explanation: ${q.explanation}</span></p><hr/>
+        `;
+      });
+
+      resultsDiv.innerHTML = `<h2>Score: ${score} / ${questions.length}</h2>` + resultsDiv.innerHTML;
+    }
+
+    renderQuiz();
+    startTimer();
+
+    // Background animation
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    const formulas = ["π", "x+y", "E = mc²", "√x", "∑", "θ", "log(x)", "a²+b²=c²"];
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1 + Math.random() * 2,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

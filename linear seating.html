@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Direction and Position - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1); /* white translucent */
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+
+    h2 {
+      color: #39ff14;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+    <a href="topics.html"><button>🢀</button></a>
+  <!-- Animated Background -->
+  <canvas id="backgroundCanvas"></canvas>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="header">Direction and Position</div>
+    <div class="content">
+      <div class="formula-section">
+        <h2>🔁 Direction Basics</h2>
+        <ul>
+          <li>Facing North: Left of a person = your left on paper.</li>
+          <li>Facing North: Right of a person = your right on paper.</li>
+          <li>Facing South: Left of a person = your right on paper.</li>
+          <li>Facing South: Right of a person = your left on paper.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>📐 Positional Formulas</h2>
+        <ul>
+          <li>"A is Xth to the left of B" (Facing North): A is placed X spots to the left (on paper) of B.</li>
+          <li>"A is Xth to the right of B" (Facing North): A is placed X spots to the right (on paper) of B.</li>
+          <li>"A is Xth to the left of B" (Facing South): A is placed X spots to the right (on paper) of B.</li>
+          <li>"A is Xth to the right of B" (Facing South): A is placed X spots to the left (on paper) of B.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>👥 Relative Placement Rules</h2>
+        <ul>
+          <li>"A is sitting between B and C": A is exactly in the middle of B and C. Either order is possible unless direction/facing is specified.</li>
+          <li>"Only one person sits between A and B": A and B have exactly 1 person between them. Possible positions = 2.</li>
+          <li>"A is 3rd to the left of B" (Facing North): A = B position – 3</li>
+          <li>"A is 2nd to the right of B" (Facing South): A = B position – 2</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>📏 Boundary-Based Logic</h2>
+        <ul>
+          <li>"A sits at one of the ends": A is either in position 1 or position N (total persons).</li>
+          <li>"A is second from the left end": A = position 2 (if facing North).</li>
+          <li>"The person to the immediate left/right of A…": Use direction logic to place neighbor.</li>
+          <li>"A is sitting immediately next to B": A and B are adjacent. (Positions: A–B or B–A)</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🧩 People Counting & Gaps</h2>
+        <ul>
+          <li>"There are X people between A and B": Gap = |Position(A) - Position(B)| – 1</li>
+          <li>"A and B are at the extreme ends" (2 people total): A = position 1, B = position N (or vice versa)</li>
+          <li>"A sits exactly in the middle" (odd number of seats): A = (N + 1) / 2</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🔄 Facing Opposite Direction Clues</h2>
+        <ul>
+          <li>If A faces North and B faces South, A’s right = your right; B’s right = your left.</li>
+          <li>If both face opposite, "left/right of" becomes reversed when comparing.</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>📋 Common Trap-Avoiding Rules</h2>
+        <ul>
+          <li>Never assume fixed positions without confirmation.</li>
+          <li>"Possibly" or "can be" = multiple scenarios — use elimination.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="bottomright"><button><a href="linear seating1.html">Attend Test</a></button></div>
+
+  <!-- Math Background Script -->
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

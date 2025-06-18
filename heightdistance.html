@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Height & Distance - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1); /* white translucent */
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+
+    h2 {
+      color: #39ff14;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+    <a href="topics.html"><button>🢀</button></a>
+  <!-- Animated Background -->
+  <canvas id="backgroundCanvas"></canvas>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="header">Height & Distance</div>
+    <div class="content">
+      
+<div class="formula-section">
+  <h2>📏 Height and Distance Formulas</h2>
+  <ul>
+    <li><code>sin θ = Opposite / Hypotenuse</code></li>
+    <li><code>cos θ = Adjacent / Hypotenuse</code></li>
+    <li><code>tan θ = Opposite / Adjacent</code></li>
+    <li><code>cot θ = Adjacent / Opposite = 1 / tan θ</code></li>
+    <li><code>sec θ = Hypotenuse / Adjacent = 1 / cos θ</code></li>
+    <li><code>cosec θ = Hypotenuse / Opposite = 1 / sin θ</code></li>
+    <li><code>Height = Distance × tan θ</code></li>
+    <li><code>Distance = Height / tan θ</code></li>
+    <li><code>Angle of Elevation: tan θ = Height / Distance</code></li>
+    <li><code>Angle of Depression: tan θ = Height / Distance</code></li>
+    <li><code>Object Height = d (tan θ₁ - tan θ₂)</code></li>
+    <li><code>h = (d₁ × d₂ × (tan θ₂ - tan θ₁)) / (d₂ - d₁)</code></li>
+    <li><code>l² = h² + b²</code> (Pythagorean theorem)</li>
+    <li><code>l = √(h² + b²)</code> (Diagonal length)</li>
+    <li><code>At 45°, Height = Distance</code></li>
+    <li><code>At 30°, Height = ½ × Hypotenuse</code></li>
+    <li><code>At 60°, Height = Distance × √3</code></li>
+    <li><code>cot θ = Distance / Height</code></li>
+    <li><code>Angle of depression = Angle of elevation from object</code></li>
+    <li><code>h = (d₁ × d₂ × (tan α - tan β)) / (d₁ - d₂)</code></li>
+  </ul>
+</div>
+    </div>
+  </div>
+  <div class="bottomright"><button><a href="heightdistance1.html">Attend Test</a></button></div>
+
+  <!-- Math Background Script -->
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

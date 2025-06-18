@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ages - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1); /* white translucent */
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+
+    h2 {
+      color: #39ff14;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+    <a href="topics.html"><button>🢀</button></a>
+  <!-- Animated Background -->
+  <canvas id="backgroundCanvas"></canvas>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="header">Clock Formulas</div>
+    <div class="content">
+      <div class="formula-section">
+        <h2>1. Angle Between Hour and Minute Hands</h2>
+        <ul>
+          <li><code>Angle = |11/2 × M - 30 × H|</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>2. Angle Between Hands at ‘h’ Hours and ‘m’ Minutes</h2>
+        <ul>
+          <li><code>Angle = |30H - 5.5M|</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>3. Relative Speed of Minute and Hour Hands</h2>
+        <ul>
+          <li><code>Relative speed = 5.5° per minute</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>4. When Hands are at Right Angle (90°)</h2>
+        <ul>
+          <li><code>Time = 2/11 hours before/after hour</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>5. When Hands are in a Straight Line (180°)</h2>
+        <ul>
+          <li><code>Time = 6/11 hours before/after hour</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>6. Coincidence of Hands (Overlapping)</h2>
+        <ul>
+          <li><code>Time between coincidences = 12/11 hours = 65 5/11 minutes</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>7. First Overlap After 12:00</h2>
+        <ul>
+          <li><code>First overlap = 1 × 12/11 ≈ 1:05.45</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>8. Number of Times Hands Coincide in 12 Hours</h2>
+        <ul>
+          <li><code>11 times</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>9. Hands are at Right Angles How Many Times a Day?</h2>
+        <ul>
+          <li><code>22 times in 12 hours → 44 times a day</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>10. Hands are in Straight Line How Many Times a Day?</h2>
+        <ul>
+          <li><code>22 times in 12 hours → 44 times a day</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>11. Hands are Opposite Each Other</h2>
+        <ul>
+          <li><code>Occurs every 65.45 minutes (like coincidence, but at 180°)</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>12. Hour Hand Movement per Minute</h2>
+        <ul>
+          <li><code>0.5° per minute</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>13. Minute Hand Movement per Minute</h2>
+        <ul>
+          <li><code>6° per minute</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>14. Gain of Minute Hand Over Hour Hand</h2>
+        <ul>
+          <li><code>5.5° per minute (6 - 0.5)</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>15. Time for Hands to be at Right Angle</h2>
+        <ul>
+          <li><code>M = |60H ± 180| / 5.5</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>16. Shortest Angle Between Hands</h2>
+        <ul>
+          <li><code>θ = min(Angle, 360 - Angle)</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>17. Speed Ratio of Minute to Hour Hand</h2>
+        <ul>
+          <li><code>6 / 0.5 = 12:1</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>18. Hands Overlap at:</h2>
+        <ul>
+          <li><code>H × 60 / 11 minutes past H o’clock</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>19. Time Between Two Right Angles</h2>
+        <ul>
+          <li><code>65 5/11 ÷ 2 = 32 8/11 minutes</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>20. Formula for ‘x’ Minutes Past ‘h’ Hour When Hands Coincide</h2>
+        <ul>
+          <li><code>x = 60H / 11</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="bottomright"><button><a href="clockproblem1.html">Attend Test</a></button></div>
+
+  <!-- Math Background Script -->
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

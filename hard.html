@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aptitude Topics</title>
+  <link rel="stylesheet" href="topics.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      overflow-x: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+     
+    a{
+      text-decoration: none;
+      color: white;
+    }
+    .topics-container {
+      position: relative;
+      z-index: 1;
+      padding: 40px;
+      color: white;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 3rem;
+      margin-bottom: 40px;
+      color: #39ff14;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #39ff14;
+      border-radius: 15px;
+      padding: 30px 20px;
+      font-size: 1.2rem;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+      transition: transform 0.3s ease, background 0.3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      background: rgba(57, 255, 20, 0.2);
+    }
+    
+    .back-arrow {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 32px;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .back-arrow:hover {
+      color: #018b01;
+      transform: scale(1.1);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 16px;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .dropdown:hover {
+      color: #018b01;
+      transform: scale(1.1);
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 2px solid #39ff14;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+      z-index: 1;
+    }
+
+    .dropdown-content a {
+      display: block;
+      padding: 10px;
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+      background: rgba(57, 255, 20, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="topics-container">
+<div class="back-arrow" onclick="location.href='topics.html'">&#x21A9;</div>
+    <div class="dropdown" onclick="toggleDropdown()">Difficulty &#x25BC;</div>
+    <div class="dropdown-content" id="dropdownContent">
+      <a href="easy.html">Easy</a>
+      <a href="medium.html">Medium</a>
+      <a href="hard.html">Hard</a>
+    </div>
+    <h1 class="title">Hard Level</h1>
+    <div class="cards">
+
+      <div class="card"><a href="puzzles.html">Puzzles</a></div>
+    </div>
+  </div>
+
+  <script>
+    function redirectToHome() {
+      window.location.href = "home.html";
+    }
+
+    function toggleDropdown() {
+      const dropdownContent = document.getElementById("dropdownContent");
+      dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+    }
+
+    // Reuse animated background
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const formulas = ["E = mc²", "∫ x dx", "π ≈ 3.14", "f(x) = x²", "√x", "log(x)", "Σn=1^∞", "a² + b² = c²"];
+
+    const particles = Array.from({ length: 100 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      text: formulas[Math.floor(Math.random() * formulas.length)],
+      speedY: 1 + Math.random() * 2,
+      size: 14 + Math.random() * 6,
+      opacity: 0.3 + Math.random() * 0.6
+    }));
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = '#39ff14';
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Data Interpretation Quiz - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 12px 20px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #2de60f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      font-size: 42px;
+      font-weight: bold;
+      color: #39ff14;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #39ff14;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .quiz-container, .results-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .question {
+      margin-bottom: 25px;
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .question-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 12px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .options label:hover {
+      background-color: rgba(57, 255, 20, 0.1);
+      transform: translateX(5px);
+    }
+
+    .options input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: #39ff14;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .bottom-btn {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .explanation {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .score-summary {
+      text-align: center;
+      font-size: 36px;
+      margin-bottom: 30px;
+      color: #39ff14;
+      text-shadow: 0 0 15px #39ff14;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .result-item {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .correct {
+      border-left-color: #39ff14;
+      background-color: rgba(57, 255, 20, 0.05);
+    }
+
+    .incorrect {
+      border-left-color: #ff4444;
+      background-color: rgba(255, 68, 68, 0.05);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #39ff14, #2de60f);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  
+  <!-- Quiz Page -->
+  <div id="quizPage" class="quiz-page active">
+    <div class="main-container">
+      <div class="header">📊 Data Interpretation Quiz</div>
+      <div class="timer" id="timer">Time Left: 10:00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <form id="quizForm" class="quiz-container"></form>
+      <div class="button-group">
+        <button onclick="location.href='Datainterpretation.html'">🏠 Back to Menu</button>
+        <button onclick="submitQuiz()" style="background-color: #ff6b35;">📝 Submit Quiz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Page -->
+  <div id="resultsPage" class="results-page hidden">
+    <div class="main-container">
+      <div class="header">📊 Quiz Results</div>
+      <div class="results-container">
+        <div class="score-summary" id="scoreSummary"></div>
+        <div class="results" id="results"></div>
+      </div>
+      <div class="button-group">
+        <button onclick="restartQuiz()">🔄 Retake Quiz</button>
+        <button onclick="location.href='Datainterpretation.html'">🏠 Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. Percentage Calculation",
+        options: ["100", "200", "400", "800"],
+        answer: "200",
+        explanation: "Number = \\(\\frac{40}{0.20} = 200\\)"
+      },
+      {
+        question: "2. Percentage Increase/Decrease",
+        options: ["20%", "30%", "40%", "50%"],
+        answer: "30%",
+        explanation: "Percentage Increase = \\(\\left( \\frac{65 - 50}{50} \\right) \\times 100 = 30\\%\\)"
+      },
+      {
+        question: "3. Average",
+        options: ["20", "25", "30", "35"],
+        answer: "25",
+        explanation: "Average = \\(\\frac{10 + 20 + 30 + 40}{4} = 25\\)"
+      },
+      {
+        question: "4. Weighted Average",
+        options: ["82", "83", "84", "85"],
+        answer: "84",
+        explanation: "Weighted Average = \\(\\frac{(80 \\times 2) + (90 \\times 3) + (70 \\times 1)}{2 + 3 + 1} = 84\\)"
+      },
+      {
+        question: "5. Mean",
+        options: ["10", "12.5", "15", "20"],
+        answer: "12.5",
+        explanation: "Mean = \\(\\frac{5 + 10 + 15 + 20}{4} = 12.5\\)"
+      },
+      {
+        question: "6. Median",
+        options: ["3", "5", "7", "9"],
+        answer: "5",
+        explanation: "Arrange the numbers in ascending order: 1, 3, 5, 7, 9. The middle value is 5."
+      },
+      {
+        question: "7. Mode",
+        options: ["2", "3", "4", "5"],
+        answer: "5",
+        explanation: "The number 5 appears most frequently."
+      },
+      {
+        question: "8. Range",
+        options: ["10", "20", "30", "40"],
+        answer: "40",
+        explanation: "Range = 50 - 10 = 40"
+      },
+      {
+        question: "9. Standard Deviation",
+        options: ["1.5", "2", "2.5", "3"],
+        answer: "2",
+        explanation: "Mean = 5, \\(\\sigma = \\sqrt{\\frac{(2-5)^2 + (4-5)^2 + (4-5)^2 + (4-5)^2 + (5-5)^2 + (5-5)^2 + (7-5)^2 + (9-5)^2}{8}} = 2\\)"
+      },
+      {
+        question: "10. Variance",
+        options: ["1", "2", "2.5", "3"],
+        answer: "2",
+        explanation: "Mean = 3, Variance = \\(\\frac{(1-3)^2 + (2-3)^2 + (3-3)^2 + (4-3)^2 + (5-3)^2}{5} = 2\\)"
+      },
+      {
+        question: "11. Quartiles",
+        options: ["Q1=3, Q2=5, Q3=7", "Q1=2.5, Q2=5, Q3=7.5", "Q1=3, Q2=5, Q3=8", "Q1=2, Q2=5, Q3=8"],
+        answer: "Q1=3, Q2=5, Q3=7",
+        explanation: "Q1 = 3 (25th percentile), Q2 = 5 (50th percentile), Q3 = 7 (75th percentile)."
+      },
+      {
+        question: "12. Interquartile Range (IQR)",
+        options: ["2", "4", "6", "8"],
+        answer: "4",
+        explanation: "IQR = Q3 - Q1 = 7 - 3 = 4"
+      },
+      {
+        question: "13. Z-Score",
+        options: ["0.5", "1", "1.5", "2"],
+        answer: "1",
+        explanation: "Z = \\(\\frac{7 - 5}{2} = 1\\)"
+      },
+      {
+        question: "14. Correlation Coefficient",
+        options: ["0.5", "0.8", "1", "-1"],
+        answer: "1",
+        explanation: "The points lie perfectly on a straight line, indicating a perfect positive correlation."
+      },
+      {
+        question: "15. Regression Line",
+        options: ["9", "10", "11", "12"],
+        answer: "11",
+        explanation: "y = 2(4) + 3 = 11"
+      },
+      {
+        question: "16. Slope of a Line",
+        options: ["1", "2", "3", "4"],
+        answer: "2",
+        explanation: "Slope = \\(\\frac{6 - 2}{3 - 1} = 2\\)"
+      },
+      {
+        question: "17. Intercept of a Line",
+        options: ["0", "1", "2", "-1"],
+        answer: "0",
+        explanation: "Using the slope-intercept form y = mx + b, b = 0."
+      },
+      {
+        question: "18. Compound Annual Growth Rate (CAGR)",
+        options: ["8.45%", "8.55%", "8.65%", "8.75%"],
+        answer: "8.45%",
+        explanation: "CAGR = \\(\\left( \\frac{1500}{1000} \\right)^{\\frac{1}{5}} - 1 \\approx 0.0845\\) or 8.45%"
+      },
+      {
+        question: "19. Moving Average",
+        options: ["20, 30, 40", "20, 30, 50", "20, 40, 50", "30, 40, 50"],
+        answer: "20, 30, 40",
+        explanation: "Moving averages are 20 (10+20+30)/3, 30 (20+30+40)/3, 40 (30+40+50)/3."
+      },
+      {
+        question: "20. Exponential Smoothing",
+        options: ["15", "20", "25", "30"],
+        answer: "25",
+        explanation: "S_1 = 10, S_2 = 0.5 \\times 20 + 0.5 \\times 10 = 15, S_3 = 0.5 \\times 30 + 0.5 \\times 15 = 22.5"
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+    const resultsDiv = document.getElementById("results");
+    const scoreSummary = document.getElementById("scoreSummary");
+    const timerDisplay = document.getElementById("timer");
+    const progressFill = document.getElementById("progressFill");
+    const quizPage = document.getElementById("quizPage");
+    const resultsPage = document.getElementById("resultsPage");
+    
+    let timeLeft = 10 * 60;
+    let timerInterval;
+    let userAnswers = {};
+
+    function renderQuiz() {
+      quizForm.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `
+          <p><strong>${q.question}</strong></p>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}" />
+                ${opt}
+              </label>`).join("")}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+
+      
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `Time Left: ${minutes}:${seconds}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      
+      // Store user answers
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name=q${index}]:checked`);
+        userAnswers[index] = selected ? selected.value : "Not Answered";
+      });
+
+      // Navigate to results page
+      showResults();
+    }
+
+    function showResults() {
+      let score = 0;
+      let correctCount = 0;
+      let incorrectCount = 0;
+      
+      resultsDiv.innerHTML = "";
+
+      questions.forEach((q, index) => {
+        const userAns = userAnswers[index];
+        const correct = q.answer === userAns;
+        if (correct) {
+          score++;
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+
+        const resultItem = document.createElement("div");
+        resultItem.classList.add("result-item");
+        resultItem.classList.add(correct ? "correct" : "incorrect");
+        
+        resultItem.innerHTML = `
+          <p><strong>${q.question}</strong></p>
+          <p>Your Answer: <span style="color: ${correct ? '#39ff14' : '#ff4444'}">${userAns}</span></p>
+          <p>Correct Answer: <span style="color: #39ff14">${q.answer}</span></p>
+          <div class="explanation">Explanation: ${q.explanation}</div>
+        `;
+        
+        resultsDiv.appendChild(resultItem);
+      });
+
+      // Calculate percentage
+      const percentage = Math.round((score / questions.length) * 100);
+      
+      // Show score summary
+      scoreSummary.innerHTML = `
+        <div>Final Score: ${score} / ${questions.length} (${percentage}%)</div>
+        <div style="font-size: 18px; margin-top: 10px;">
+          <span style="color: #39ff14;">✓ Correct: ${correctCount}</span> | 
+          <span style="color: #ff4444;">✗ Incorrect: ${incorrectCount}</span>
+        </div>
+      `;
+
+      // Switch to results page
+      quizPage.classList.remove("active");
+      resultsPage.classList.add("active");
+    }
+
+    function restartQuiz() {
+      // Reset everything
+      userAnswers = {};
+      timeLeft = 10 * 60;
+      quizForm.innerHTML = "";
+      
+      // Switch back to quiz page
+      resultsPage.classList.remove("active");
+      quizPage.classList.add("active");
+      
+      // Re-render quiz and restart timer
+      renderQuiz();
+      startTimer();
+    }
+
+    // Initialize quiz
+    renderQuiz();
+    startTimer();
+
+    // Background animation
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    const formulas = ["π", "x+y", "E = mc²", "√x", "∑", "θ", "log(x)", "a²+b²=c²"];
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1 + Math.random() * 2,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

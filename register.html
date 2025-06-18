@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register Page</title>
+  <link rel="stylesheet" href="login.css" />
+  <style>
+    .role-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 34px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="main-container">
+    <div class="left-panel">
+      <div class="title-container">
+        <div class="title">APTIX</div>
+        <h4>"A platform to learn Aptitude."</h4>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="login-container">
+        <h2>Register</h2>
+
+        <!-- Role Toggle Switch -->
+        <div class="role-toggle">
+          <span>User</span>
+          <label class="switch">
+            <input type="checkbox" id="regRoleToggle" onchange="updateRegRole()" />
+            <span class="slider"></span>
+          </label>
+          <span id="regRoleLabel">Admin</span>
+        </div>
+
+        <div class="input-group">
+          <input type="text" id="new-username" required />
+          <label for="new-username">Username</label>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="new-password" required />
+          <label for="new-password">Password</label>
+          <span id="reg-eye-icon" class="eye-icon" onclick="toggleRegisterPassword()">👁️</span>
+        </div>
+
+        <button onclick="register()">Register</button>
+        <p id="reg-error" class="error-msg"></p>
+        <p class="register-link">Already have an account? <a href="login.html">Sign In</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleRegisterPassword() {
+      const passwordField = document.getElementById("new-password");
+      const eyeIcon = document.getElementById("reg-eye-icon");
+      const isPassword = passwordField.type === "password";
+      passwordField.type = isPassword ? "text" : "password";
+      eyeIcon.textContent = isPassword ? "🙈" : "👁️";
+    }
+
+    function updateRegRole() {
+      const toggle = document.getElementById("regRoleToggle");
+      const label = document.getElementById("regRoleLabel");
+      label.textContent = toggle.checked ? "Admin" : "User";
+    }
+  </script>
+
+  <script>
+    // Background animation
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function initParticles() {
+      particles = Array.from({ length: 120 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = '#39ff14';
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+          p.speedY = 1.5 + Math.random() * 2.5;
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    initParticles();
+    draw();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initParticles();
+    });
+  </script>
+
+  <script src="register.js"></script>
+</body>
+</html>

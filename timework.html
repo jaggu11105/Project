@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time and Work - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    a {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .back {
+      margin-top: 5px;
+      width: 20px;
+      height: 8px;
+      background-color: white;
+      color: black;
+    }
+
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+
+    h2 {
+      color: #39ff14;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>  
+  <a href="topics.html"><button>🢀</button></a>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <div class="header">Time and Work</div>
+    <div class="content">
+      <div class="formula-section">
+        <h2>⚙️ Basic Concepts</h2>
+        <ul>
+          <li><code>Work = Time × Rate</code></li>
+          <li><code>Rate = Work / Time</code></li>
+          <li><code>Time = Work / Rate</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>👥 Individual & Combined Work</h2>
+        <ul>
+          <li><code>If A can do a piece of work in x days, then A's 1 day work = 1/x</code></li>
+          <li><code>If A and B can do the same work in x and y days respectively,<br>then together: 1 day work = (1/x + 1/y)</code></li>
+          <li><code>Time taken together = (x × y) / (x + y)</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🔁 Alternate Work / Replacement</h2>
+        <ul>
+          <li><code>If A and B work alternately, calculate individual day contribution and repeat pattern</code></li>
+          <li><code>If A is replaced by B after some time, calculate work done in parts</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>👨‍👩‍👧‍👦 Man-Day Work Relationship</h2>
+        <ul>
+          <li><code>Work = Men × Days × Hours</code></li>
+          <li><code>Men₁ × Days₁ × Hours₁ = Men₂ × Days₂ × Hours₂ (if work is same)</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🚰 Pipes and Cisterns</h2>
+        <ul>
+          <li><code>If a pipe fills in x hours, 1 hour work = 1/x</code></li>
+          <li><code>If a pipe empties in y hours, 1 hour work = -1/y</code></li>
+          <li><code>Net rate = Inlet - Outlet</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>📉 Efficiency-based Work</h2>
+        <ul>
+          <li><code>If A is k times as efficient as B, then A takes 1/k times less time than B</code></li>
+          <li><code>Work is inversely proportional to time if efficiency is constant</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🔄 Fraction of Work</h2>
+        <ul>
+          <li><code>If A does 1/3 of work in 5 days, total work = 5 × 3 = 15 days</code></li>
+          <li><code>Work remaining = 1 - (work done)</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomright">
+    <button onclick="startTest()">Attend Test</button>
+  </div>
+
+  <script>
+    function startTest() {
+      alert("After clicking 'Attend Test', the timer will start.");
+      window.location.href = "timework1.html";
+    }
+
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home - APTIX</title>
+  <link rel="stylesheet" href="login.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Navigation Bar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #333;
+      padding: 15px 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4CAF50;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 30px;
+    }
+
+    .navbar a {
+      text-decoration: none;
+      color: #ccc;
+      font-size: 16px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .navbar a:hover {
+      color: #4CAF50;
+    }
+
+    /* Main Container */
+    .main-container {
+      display: flex;
+      flex-direction: row;
+      height: calc(100vh - 72px);
+    }
+
+    .left-panel {
+      background-color: transparent;
+      color: white;
+      width: 40%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 40px 20px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .left-panel .title {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .left-panel h4 {
+      margin-top: 15px;
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 400;
+    }
+
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #111;
+      padding: 50px 20px;
+      text-align: center;
+    }
+
+    .welcome-container h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .welcome-container p {
+      font-size: 18px;
+      color: #aaa;
+      animation: fadeIn 2s ease-in-out 0.5s;
+    }
+
+    .logout-btn {
+      margin-top: 30px;
+      padding: 12px 24px;
+      background-color: #222;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      animation: fadeIn 2s ease-in-out 1s;
+    }
+
+    .logout-btn:hover {
+      background-color: #444;
+      color: #fff;
+      box-shadow: 0 0 10px #39ff14;
+    }
+
+    .quick-actions button {
+      margin: 5px;
+      padding: 10px 20px;
+      background-color: transparent;
+      color: #0f0;
+      border: 2px solid #0f0;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .quick-actions button::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: #0f0;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .quick-actions button:hover::before {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+
+      .left-panel {
+        width: 100%;
+        padding: 30px 10px;
+      }
+
+      .right-panel {
+        padding: 30px 10px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .navbar-links {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <div class="navbar">
+    <div class="logo">APTIX</div>
+    <div class="navbar-links">
+      <a href="home.html">Home</a>
+      <a href="topics.html">Topics</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="left-panel">
+      <div class="title">APTIX</div>
+      <h4>"A platform to learn Aptitude."</h4>
+    </div>
+
+    <div class="right-panel">
+      <div class="welcome-container">
+        <h1>Welcome to APTIX</h1>
+        <p>This is your home dashboard.</p>
+      </div>
+      <div class="quick-actions">
+        <button onclick="startNewSession()">Start New Session</button>
+        <button onclick="viewProgress()">View Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Animated Background -->
+  <canvas id="backgroundCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const formulas = ["E = mc²", "∫ x dx", "π ≈ 3.14", "f(x) = x²", "√x", "log(x)", "Σn=1^∞", "a² + b² = c²"];
+
+    const particles = Array.from({ length: 100 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      text: formulas[Math.floor(Math.random() * formulas.length)],
+      speedY: 1 + Math.random() * 2,
+      size: 14 + Math.random() * 6,
+      opacity: 0.3 + Math.random() * 0.6
+    }));
+
+    function draw() {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach(p => {
+        ctx.shadowColor = '#00ff00'; // Green neon color
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = `rgba(0, 255, 0, ${p.opacity})`; // Green text with opacity
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    window.addEventListener("resize", () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+
+  <script>
+    function logout() {
+      window.location.href = "login.html";
+    }
+
+    function startNewSession() {
+      alert("Starting a new learning session...");
+      // Add functionality to start a new session
+      window.location.href = "topics.html";
+    }
+  
+
+    function viewProgress() {
+      alert("Viewing your progress...");
+      // Add functionality to view progress
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Algebra & Equations Quiz - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 12px 20px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #2de60f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      font-size: 42px;
+      font-weight: bold;
+      color: #39ff14;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #39ff14;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .menu-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 40px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .quiz-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(57, 255, 20, 0.3);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 15px rgba(57, 255, 20, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .formula-section:hover {
+      transform: translateY(-5px);
+      border-color: rgba(57, 255, 20, 0.6);
+      box-shadow: 0 8px 25px rgba(57, 255, 20, 0.2);
+    }
+
+    .formula-section h2 {
+      color: #39ff14;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    .formula-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+    }
+
+    .formula-item {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid #39ff14;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .formula-item:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateX(5px);
+    }
+
+    .question {
+      margin-bottom: 25px;
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .question-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 12px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .options label:hover {
+      background-color: rgba(57, 255, 20, 0.1);
+      transform: translateX(5px);
+    }
+
+    .options input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: #39ff14;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .bottom-btn {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .explanation {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .score-header {
+      text-align: center;
+      font-size: 36px;
+      color: #39ff14;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px #39ff14;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .result-item {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .correct {
+      border-left-color: #39ff14;
+      background-color: rgba(57, 255, 20, 0.05);
+    }
+
+    .incorrect {
+      border-left-color: #ff4444;
+      background-color: rgba(255, 68, 68, 0.05);
+    }
+
+    .user-answer {
+      color: #ff9999;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #99ff99;
+      font-weight: bold;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #39ff14, #2de60f);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <!-- Menu Page -->
+    <div id="menuPage">
+      <div class="header">📐 Algebra & Equations - Problem Solving</div>
+      <div class="menu-container">
+        <div class="formula-section">
+          <h2>📋 Algebra & Equations Formulas & Concepts</h2>
+          <div class="formula-list">
+            <div class="formula-item">Slope-Intercept: y = mx + b</div>
+            <div class="formula-item">Quadratic Formula: x = (-b ± √(b² - 4ac)) / 2a</div>
+            <div class="formula-item">Distance Formula: √((x₂ - x₁)² + (y₂ - y₁)²)</div>
+            <div class="formula-item">Midpoint: ((x₁ + x₂) / 2, (y₁ + y₂) / 2)</div>
+            <div class="formula-item">Standard Form: ax² + bx + c = 0</div>
+            <div class="formula-item">Vertex Form: y = a(x - h)² + k</div>
+            <div class="formula-item">Slope: (y₂ - y₁) / (x₂ - x₁)</div>
+            <div class="formula-item">Sum of n terms: n(n + 1) / 2</div>
+            <div class="formula-item">Arithmetic Series: n/2 * (a₁ + aₙ)</div>
+            <div class="formula-item">Geometric Series: a₁ * (1 - rⁿ) / (1 - r)</div>
+            <div class="formula-item">Circle Area: πr²</div>
+            <div class="formula-item">Sphere Volume: (4/3)πr³</div>
+          </div>
+        </div>
+        
+        <div class="nav-buttons">
+          <button onclick="showQuiz()">🎯 Start Quiz</button>
+          <button onclick="showFormulas()">📚 View All Formulas</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulas Page -->
+    <div id="formulasPage" class="hidden">
+      <div class="header">📐 Algebra & Equations Formulas</div>
+      <div class="quiz-container">
+        <div class="formula-section">
+          <h2>📏 Linear Equations</h2>
+          <div class="formula-list">
+            <div class="formula-item">Slope-intercept form: y = mx + b</div>
+            <div class="formula-item">Point-slope form: y - y₁ = m(x - x₁)</div>
+            <div class="formula-item">Standard form: Ax + By = C</div>
+            <div class="formula-item">Slope formula: m = (y₂ - y₁) / (x₂ - x₁)</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>📊 Quadratic Equations</h2>
+          <div class="formula-list">
+            <div class="formula-item">Standard form: ax² + bx + c = 0</div>
+            <div class="formula-item">Vertex form: y = a(x - h)² + k</div>
+            <div class="formula-item">Quadratic formula: x = (-b ± √(b² - 4ac)) / 2a</div>
+            <div class="formula-item">Discriminant: b² - 4ac</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>📐 Coordinate Geometry</h2>
+          <div class="formula-list">
+            <div class="formula-item">Distance formula: √((x₂ - x₁)² + (y₂ - y₁)²)</div>
+            <div class="formula-item">Midpoint formula: ((x₁ + x₂) / 2, (y₁ + y₂) / 2)</div>
+            <div class="formula-item">Section formula: ((mx₂ + nx₁)/(m + n), (my₂ + ny₁)/(m + n))</div>
+            <div class="formula-item">Area of triangle: ½|x₁(y₂ - y₃) + x₂(y₃ - y₁) + x₃(y₁ - y₂)|</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>🔢 Sequences & Series</h2>
+          <div class="formula-list">
+            <div class="formula-item">Arithmetic sequence: aₙ = a₁ + (n - 1)d</div>
+            <div class="formula-item">Geometric sequence: aₙ = a₁ * r^(n - 1)</div>
+            <div class="formula-item">Arithmetic series: Sₙ = n/2 * (a₁ + aₙ)</div>
+            <div class="formula-item">Geometric series: Sₙ = a₁ * (1 - rⁿ) / (1 - r)</div>
+          </div>
+        </div>
+
+        <div class="formula-section">
+          <h2>🌐 Circles & Geometry</h2>
+          <div class="formula-list">
+            <div class="formula-item">Circle area: A = πr²</div>
+            <div class="formula-item">Circle circumference: C = 2πr</div>
+            <div class="formula-item">Sphere volume: V = (4/3)πr³</div>
+            <div class="formula-item">Sphere surface area: A = 4πr²</div>
+            <div class="formula-item">Cylinder volume: V = πr²h</div>
+            <div class="formula-item">Cone volume: V = (1/3)πr²h</div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-btn">
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+      </div>
+    </div>
+    
+    <!-- Quiz Page -->
+    <div id="quizPage" class="hidden">
+      <div class="header">🎯 Algebra & Equations Quiz</div>
+      <div class="timer" id="timer">Time Left: 20:00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <form id="quizForm" class="quiz-container"></form>
+      <div class="button-group">
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+        <button onclick="submitQuiz()" style="background-color: #ff6b35;">📝 Submit Quiz</button>
+      </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="hidden">
+      <div id="scoreDisplay" class="score-header"></div>
+      <div class="quiz-container">
+        <div id="results"></div>
+      </div>
+      <div class="button-group">
+        <button onclick="restartQuiz()">🔄 Retake Quiz</button>
+        <button onclick="showMenu()">🏠 Back to Menu</button>
+        <button onclick="showFormulas()">📚 Review Formulas</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Canvas background animation from ages.html
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "E = mc²", "∫ x dx", "π ≈ 3.14", "Δx → 0", "f(x) = x²", "Σn=1^∞", "a² + b² = c²",
+      "∂/∂x", "∇·E = ρ/ε₀", "sinθ", "cosθ", "tanθ", "λ", "θ", "∞", "√x", "log(x)", "dx/dt",
+      "μ", "σ²", "Φ", "Ω", "γ", "𝑛!", "∑", "∫", "lim x→∞", "P(A|B)", "∛x", "d²y/dx²"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    // Initialize canvas background
+    resizeCanvas();
+    initParticles();
+    draw();
+
+    // Quiz functionality
+    const questions = [
+      {
+        question: "1. What is the formula for the slope-intercept form of a line?",
+        options: ["y = mx + b", "y - y1 = m(x - x1)", "Ax + By = C", "y = ax^2 + bx + c"],
+        answer: "y = mx + b",
+        explanation: "The slope-intercept form of a line is y = mx + b, where m is the slope and b is the y-intercept."
+      },
+      {
+        question: "2. What is the quadratic formula?",
+        options: ["x = (-b ± √(b² - 4ac)) / 2a", "x = (-b ± √(b² + 4ac)) / 2a", "x = (b ± √(b² - 4ac)) / 2a", "x = (-b ± √(b² - 4ac)) / a"],
+        answer: "x = (-b ± √(b² - 4ac)) / 2a",
+        explanation: "The quadratic formula is x = (-b ± √(b² - 4ac)) / 2a, used to solve quadratic equations of the form ax² + bx + c = 0."
+      },
+      {
+        question: "3. What is the formula for the distance between two points (x1, y1) and (x2, y2)?",
+        options: ["√((x2 - x1)² + (y2 - y1)²)", "√((x2 + x1)² + (y2 + y1)²)", "(x2 - x1) + (y2 - y1)", "(x2 + x1) + (y2 + y1)"],
+        answer: "√((x2 - x1)² + (y2 - y1)²)",
+        explanation: "The distance formula is √((x2 - x1)² + (y2 - y1)²), used to find the distance between two points in a coordinate plane."
+      },
+      {
+        question: "4. What is the formula for the midpoint of a line segment with endpoints (x1, y1) and (x2, y2)?",
+        options: ["((x1 + x2) / 2, (y1 + y2) / 2)", "((x1 - x2) / 2, (y1 - y2) / 2)", "(x1 + x2, y1 + y2)", "(x1 - x2, y1 - y2)"],
+        answer: "((x1 + x2) / 2, (y1 + y2) / 2)",
+        explanation: "The midpoint formula is ((x1 + x2) / 2, (y1 + y2) / 2), used to find the midpoint of a line segment."
+      },
+      {
+        question: "5. What is the standard form of a quadratic equation?",
+        options: ["ax² + bx + c = 0", "y = mx + b", "Ax + By = C", "y = a(x - h)² + k"],
+        answer: "ax² + bx + c = 0",
+        explanation: "The standard form of a quadratic equation is ax² + bx + c = 0."
+      },
+      {
+        question: "6. What is the vertex form of a quadratic equation?",
+        options: ["y = a(x - h)² + k", "y = mx + b", "ax² + bx + c = 0", "y = x² + bx + c"],
+        answer: "y = a(x - h)² + k",
+        explanation: "The vertex form of a quadratic equation is y = a(x - h)² + k, where (h, k) is the vertex of the parabola."
+      },
+      {
+        question: "7. What is the formula for the slope of a line passing through points (x1, y1) and (x2, y2)?",
+        options: ["(y2 - y1) / (x2 - x1)", "(y2 + y1) / (x2 + x1)", "(x2 - x1) / (y2 - y1)", "(x2 + x1) / (y2 + y1)"],
+        answer: "(y2 - y1) / (x2 - x1)",
+        explanation: "The slope formula is (y2 - y1) / (x2 - x1), used to find the slope of a line passing through two points."
+      },
+      {
+        question: "8. What is the formula for the sum of the first n natural numbers?",
+        options: ["n(n + 1) / 2", "n(n - 1) / 2", "n²", "2n"],
+        answer: "n(n + 1) / 2",
+        explanation: "The sum of the first n natural numbers is given by n(n + 1) / 2."
+      },
+      {
+        question: "9. What is the formula for the sum of an arithmetic series?",
+        options: ["n/2 * (a1 + an)", "n * (a1 + an)", "n * (a1 - an)", "n/2 * (a1 - an)"],
+        answer: "n/2 * (a1 + an)",
+        explanation: "The sum of an arithmetic series is given by n/2 * (a1 + an), where n is the number of terms, a1 is the first term, and an is the last term."
+      },
+      {
+        question: "10. What is the formula for the nth term of an arithmetic sequence?",
+        options: ["a1 + (n - 1)d", "a1 + nd", "a1 - (n - 1)d", "a1 + n²d"],
+        answer: "a1 + (n - 1)d",
+        explanation: "The nth term of an arithmetic sequence is given by a1 + (n - 1)d, where a1 is the first term and d is the common difference."
+      },
+      {
+        question: "11. What is the formula for the nth term of a geometric sequence?",
+        options: ["a1 * r^(n - 1)", "a1 * r^n", "a1 + r^(n - 1)", "a1 + r^n"],
+        answer: "a1 * r^(n - 1)",
+        explanation: "The nth term of a geometric sequence is given by a1 * r^(n - 1), where a1 is the first term and r is the common ratio."
+      },
+      {
+        question: "12. What is the formula for the sum of a geometric series?",
+        options: ["a1 * (1 - r^n) / (1 - r)", "a1 * (1 - r^n) / (1 + r)", "a1 * (1 + r^n) / (1 - r)", "a1 * (1 + r^n) / (1 + r)"],
+        answer: "a1 * (1 - r^n) / (1 - r)",
+        explanation: "The sum of a geometric series is given by a1 * (1 - r^n) / (1 - r), where a1 is the first term, r is the common ratio, and n is the number of terms."
+      },
+      {
+        question: "13. What is the formula for the area of a triangle given base b and height h?",
+        options: ["(1/2) * b * h", "b * h", "2 * b * h", "(1/2) * (b + h)"],
+        answer: "(1/2) * b * h",
+        explanation: "The area of a triangle is given by (1/2) * b * h, where b is the base and h is the height."
+      },
+      {
+        question: "14. What is the formula for the area of a circle with radius r?",
+        options: ["πr²", "2πr", "πr", "4πr²"],
+        answer: "πr²",
+        explanation: "The area of a circle is given by πr², where r is the radius."
+      },
+      {
+        question: "15. What is the formula for the circumference of a circle with radius r?",
+        options: ["2πr", "πr²", "πr", "4πr"],
+        answer: "2πr",
+        explanation: "The circumference of a circle is given by 2πr, where r is the radius."
+      },
+      {
+        question: "16. What is the formula for the volume of a cylinder with radius r and height h?",
+        options: ["πr²h", "2πrh", "πr²", "2πr²h"],
+        answer: "πr²h",
+        explanation: "The volume of a cylinder is given by πr²h, where r is the radius and h is the height."
+      },
+      {
+        question: "17. What is the formula for the surface area of a sphere with radius r?",
+        options: ["4πr²", "2πr²", "πr²", "3πr²"],
+        answer: "4πr²",
+        explanation: "The surface area of a sphere is given by 4πr², where r is the radius."
+      },
+      {
+        question: "18. What is the formula for the volume of a sphere with radius r?",
+        options: ["(4/3)πr³", "2πr³", "πr³", "4πr³"],
+        answer: "(4/3)πr³",
+        explanation: "The volume of a sphere is given by (4/3)πr³, where r is the radius."
+      },
+      {
+        question: "19. What is the formula for the volume of a cone with radius r and height h?",
+        options: ["(1/3)πr²h", "πr²h", "(1/2)πr²h", "2πr²h"],
+        answer: "(1/3)πr²h",
+        explanation: "The volume of a cone is given by (1/3)πr²h, where r is the radius and h is the height."
+      },
+      {
+        question: "20. What is the formula for the surface area of a cylinder with radius r and height h?",
+        options: ["2πrh + 2πr²", "2πrh", "2πr²", "4πrh"],
+        answer: "2πrh + 2πr²",
+        explanation: "The surface area of a cylinder is given by 2πrh + 2πr², where r is the radius and h is the height."
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+    const resultsDiv = document.getElementById("results");
+    const timerDisplay = document.getElementById("timer");
+    const progressFill = document.getElementById("progressFill");
+    const menuPage = document.getElementById("menuPage");
+    const formulasPage = document.getElementById("formulasPage");
+    const quizPage = document.getElementById("quizPage");
+    const resultsPage = document.getElementById("resultsPage");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    
+    let timeLeft = 20 * 60;
+    let timerInterval;
+    let userAnswers = {};
+
+    function showMenu() {
+      hideAllPages();
+      menuPage.classList.remove("hidden");
+    }
+
+    function showFormulas() {
+      hideAllPages();
+      formulasPage.classList.remove("hidden");
+    }
+
+    function showQuiz() {
+      hideAllPages();
+      quizPage.classList.remove("hidden");
+      renderQuiz();
+      startTimer();
+    }
+
+    function hideAllPages() {
+      menuPage.classList.add("hidden");
+      formulasPage.classList.add("hidden");
+      quizPage.classList.add("hidden");
+      resultsPage.classList.add("hidden");
+    }
+
+    function renderQuiz() {
+      quizForm.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `
+          <div class="question-text">${q.question}</div>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}" />
+                ${opt}
+              </label>`).join("")}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(userAnswers).length;
+      const progress = (answered / questions.length) * 100;
+      progressFill.style.width = progress + '%';
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 20 * 60;
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `⏱️ Time Left: ${minutes}:${seconds}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    // Track answers in real time
+    document.addEventListener('change', function(e) {
+      if (e.target.type === 'radio') {
+        const questionIndex = e.target.name.replace('q', '');
+        userAnswers[questionIndex] = e.target.value;
+        updateProgress();
+      }
+    });
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      
+      // Collect any remaining answers
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name=q${index}]:checked`);
+        if (selected && !userAnswers[index]) {
+          userAnswers[index] = selected.value;
+        }
+      });
+
+      hideAllPages();
+      resultsPage.classList.remove("hidden");
+      displayResults();
+    }
+
+    function displayResults() {
+      let score = 0;
+      let resultsHTML = "";
+
+      questions.forEach((q, index) => {
+        const userAns = userAnswers[index] || "Not Answered";
+        const correct = q.answer === userAns;
+        if (correct) score++;
+
+        resultsHTML += `
+          <div class="result-item ${correct ? 'correct' : 'incorrect'}">
+            <div class="question-text">${q.question}</div>
+            <p><strong>Your Answer:</strong> <span class="user-answer">${userAns}</span></p>
+            <p><strong>Correct Answer:</strong> <span class="correct-answer">${q.answer}</span></p>
+            <div class="explanation"><strong>Explanation:</strong> ${q.explanation}</div>
+          </div>
+        `;
+      });
+
+      const percentage = Math.round((score / questions.length) * 100);
+      let grade = "";
+      if (percentage >= 90) grade = "🏆 Excellent!";
+      else if (percentage >= 80) grade = "👍 Great Job!";
+      else if (percentage >= 70) grade = "🙂 Good Effort";
+      else if (percentage >= 60) grade = "😕 Needs Improvement";
+      else grade = "😞 Keep Practicing";
+
+      scoreDisplay.innerHTML = `${grade} Your Score: ${score}/${questions.length} (${percentage}%)`;
+      resultsDiv.innerHTML = resultsHTML;
+    }
+
+    function restartQuiz() {
+      userAnswers = {};
+      showQuiz();
+    }
+  </script>
+</body>
+</html>

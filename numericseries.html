@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Number Series - Aptix</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      overflow: hidden;
+    }
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 10px;
+      font-weight: bold;
+    }
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    a { text-decoration: none; color: #000; }
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 40px;
+      font-weight: bold;
+      color: #ffffff;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .content {
+      margin: auto;
+      max-width: 800px;
+      height: 100%;
+      overflow-y: auto;
+      padding: 30px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(4px);
+    }
+    .formula-section {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .bottomright {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      color: white;
+      font-size: 20px;
+    }
+    .formula-section:hover {
+      transform: translateY(-5px);
+      opacity: 0.98;
+    }
+    h2 { color: #39ff14; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 10px; color: #fff; }
+    code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+    <a href="topics.html"><button>🢀</button></a>
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="main-container">
+    <div class="header">Number Series</div>
+    <div class="content">
+      <div class="formula-section">
+        <h2>🔢 Common Number Series Types</h2>
+        <ul>
+          <li><strong>Arithmetic Series</strong>: Difference is constant<br><code>n, n+d, n+2d, ...</code></li>
+          <li><strong>Geometric Series</strong>: Ratio is constant<br><code>n, n×r, n×r², ...</code></li>
+          <li><strong>Square/Cube Series</strong>: Based on squares or cubes<br><code>1, 4, 9, 16, ...</code> (squares)</li>
+          <li><strong>Fibonacci Series</strong>: Sum of last two terms<br><code>0, 1, 1, 2, 3, 5, 8, ...</code></li>
+          <li><strong>Prime Numbers</strong>: 2, 3, 5, 7, 11, 13, 17...</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🧠 Tricks to Crack Number Series</h2>
+        <ul>
+          <li>Check for difference between terms</li>
+          <li>If difference isn’t constant, check second difference (used in squares)</li>
+          <li>Look for multiplication/division patterns</li>
+          <li>Alternate terms may form their own pattern</li>
+          <li>Try reverse logic if series decreases</li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>📘 Special Series Patterns</h2>
+        <ul>
+          <li><code>n² ± n</code> → e.g., 2, 6, 12, 20, ...</li>
+          <li><code>n³ ± 1</code> → e.g., 0, 8, 26, 64, 124, ...</li>
+          <li><code>n × (n+1)</code> → 2, 6, 12, 20, 30, ...</li>
+          <li>Sum of first N natural numbers → <code>n(n+1)/2</code></li>
+          <li>Sum of squares → <code>n(n+1)(2n+1)/6</code></li>
+        </ul>
+      </div>
+
+      <div class="formula-section">
+        <h2>🔍 Examples to Practice</h2>
+        <ul>
+          <li>What comes next? <code>2, 6, 12, 20, ?</code><br>→ Difference: +4, +6, +8, so next: +10 → 30</li>
+          <li>Find the wrong number: <code>2, 4, 8, 16, 33, 64</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottomright">
+    <button><a href="number-series-test.html">Attend Test</a></button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas?.getContext("2d");
+
+    const formulas = [
+      "n(n+1)/2", "n(n+1)(2n+1)/6", "n²", "n³", "2, 4, 8", "+2", "×2", "√", "∑", "∞", "Fibonacci", "Prime", "log", "×"
+    ];
+
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 100 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1.5 + Math.random() * 2.5,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

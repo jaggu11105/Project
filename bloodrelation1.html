@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blood Relation Quiz - Aptix</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #000;
+      color: white;
+      height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button {
+      background-color: #39ff14;
+      color: #000;
+      padding: 12px 20px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #2de60f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+    }
+
+    canvas#backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      font-size: 42px;
+      font-weight: bold;
+      color: #39ff14;
+      text-align: center;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px #39ff14;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .quiz-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .question {
+      margin-bottom: 25px;
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .question-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .options label {
+      display: block;
+      margin-bottom: 12px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .options label:hover {
+      background-color: rgba(57, 255, 20, 0.1);
+      transform: translateX(5px);
+    }
+
+    .options input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .timer {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 25px;
+      color: #39ff14;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .results {
+      margin-top: 20px;
+    }
+
+    .bottom-btn {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .explanation {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .score-header {
+      text-align: center;
+      font-size: 36px;
+      color: #39ff14;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px #39ff14;
+      animation: bounce 1s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+
+    .result-item {
+      background-color: rgba(255, 255, 255, 0.03);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #39ff14;
+    }
+
+    .correct {
+      border-left-color: #39ff14;
+      background-color: rgba(57, 255, 20, 0.05);
+    }
+
+    .incorrect {
+      border-left-color: #ff4444;
+      background-color: rgba(255, 68, 68, 0.05);
+    }
+
+    .user-answer {
+      color: #ff9999;
+      font-weight: bold;
+    }
+
+    .correct-answer {
+      color: #99ff99;
+      font-weight: bold;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #39ff14, #2de60f);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div class="main-container">
+    <!-- Quiz Page -->
+    <div id="quizPage">
+      <div class="header">👶 Blood Relation Quiz</div>
+      <div class="timer" id="timer">Time Left: 20:00</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <form id="quizForm" class="quiz-container"></form>
+      <div class="button-group">
+        <button onclick="location.href='bloodrelation.html'">🏠 Back to Menu</button>
+        <button onclick="submitQuiz()" style="background-color: #ff6b35;">📝 Submit Quiz</button>
+      </div>
+    </div>
+
+    <!-- Results Page -->
+    <div id="resultsPage" class="hidden">
+      <div id="scoreDisplay" class="score-header"></div>
+      <div class="quiz-container">
+        <div id="results"></div>
+      </div>
+      <div class="button-group">
+        <button onclick="restartQuiz()">🔄 Retake Quiz</button>
+        <button onclick="location.href='bloodrelation1.html'">🏠 Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "1. A's father is B's son. C is the father of A. How is B related to C?",
+        options: ["Father", "Grandfather", "Son", "Brother"],
+        answer: "Grandfather",
+        explanation: "A's father is B's son → B is A's grandfather. C is A's father → B is grandfather of C's child → B is father of C → B is grandfather."
+      },
+      {
+        question: "2. X introduces Y as the son of the only daughter of the father of his uncle. How is Y related to X?",
+        options: ["Brother", "Cousin", "Nephew", "Uncle"],
+        answer: "Cousin",
+        explanation: "Father of X's uncle = X's grandfather. His only daughter = X's aunt. Her son = X's cousin."
+      },
+      {
+        question: "3. Pointing to a man, Rita said, 'He is the son of my grandfather's only son.' Who is the man to Rita?",
+        options: ["Brother", "Father", "Cousin", "Uncle"],
+        answer: "Brother",
+        explanation: "Grandfather's only son = Rita's father. His son = Rita's brother."
+      },
+      {
+        question: "4. A woman introduces a man as the son of the brother of her mother. How is the man related to the woman?",
+        options: ["Cousin", "Uncle", "Nephew", "Brother"],
+        answer: "Cousin",
+        explanation: "Mother's brother = uncle, his son = cousin."
+      },
+      {
+        question: "5. A + B means A is the daughter of B. A × B means A is the father of B. A ÷ B means A is the mother of B. Then what does A + B ÷ C mean?",
+        options: ["A is the niece of C", "A is the granddaughter of C", "A is the daughter of C", "A is the sister of C"],
+        answer: "A is the granddaughter of C",
+        explanation: "B ÷ C → B is mother of C; A + B → A is daughter of B → A is granddaughter of C."
+      },
+      {
+        question: "6. A is B's sister. C is B's father. D is C's sister. How is D related to A?",
+        options: ["Aunt", "Mother", "Sister", "Cousin"],
+        answer: "Aunt",
+        explanation: "C is A's father, D is his sister → D is A's aunt."
+      },
+      {
+        question: "7. If A is the brother of B, B is the sister of C, and C is the father of D, how is A related to D?",
+        options: ["Uncle", "Father", "Brother", "Grandfather"],
+        answer: "Uncle",
+        explanation: "C is D's father, B is C's sister, A is B's brother → A is C's brother → A is uncle of D."
+      },
+      {
+        question: "8. Introducing a man to her husband, a woman said, 'His brother's father is the only son of my grandfather.' How is the woman related to the man?",
+        options: ["Sister", "Aunt", "Niece", "Mother"],
+        answer: "Sister",
+        explanation: "Only son of her grandfather = her father. His brother's father = her father → the man is her brother."
+      },
+      {
+        question: "9. A says, 'B's father is the only son of my father.' How is A related to B?",
+        options: ["Father", "Uncle", "Brother", "Cousin"],
+        answer: "Father",
+        explanation: "Only son of A's father = A himself. B's father = A → A is B's father."
+      },
+      {
+        question: "10. A man said to a lady, 'The son of your only brother is the brother of my wife.' How is the lady related to the man?",
+        options: ["Mother-in-law", "Sister of father-in-law", "Sister", "Aunt"],
+        answer: "Aunt",
+        explanation: "Lady's only brother's son = nephew. He is man's brother-in-law → lady is wife's aunt → man's aunt-in-law."
+      },
+      {
+        question: "11. If 'A * B' means A is the father of B, 'A + B' means A is the daughter of B, then what does 'P * Q + R' mean?",
+        options: ["P is father of R", "P is father of Q and Q is daughter of R", "R is father of Q", "Q is daughter of R"],
+        answer: "P is father of Q and Q is daughter of R",
+        explanation: "P * Q → P is father of Q; Q + R → Q is daughter of R."
+      },
+      {
+        question: "12. Introducing a boy, a girl said, 'He is the son of the daughter of the father of my uncle.' How is the boy related to the girl?",
+        options: ["Brother", "Nephew", "Cousin", "Uncle"],
+        answer: "Cousin",
+        explanation: "Father of uncle = grandfather → his daughter = girl's aunt → her son = cousin."
+      },
+      {
+        question: "13. A is the mother of B. C is the father of A. D is the son of C. How is D related to B?",
+        options: ["Uncle", "Brother", "Father", "Grandfather"],
+        answer: "Uncle",
+        explanation: "D is A's brother → B's uncle."
+      },
+      {
+        question: "14. A is the brother of B. B is the mother of C. D is the father of A. How is D related to C?",
+        options: ["Grandfather", "Uncle", "Father", "Great Grandfather"],
+        answer: "Grandfather",
+        explanation: "D is A and B's father; B is C's mother → D is grandfather of C."
+      },
+      {
+        question: "15. A is B's brother. C is B's mother. D is C's father. E is D's mother. How is E related to A?",
+        options: ["Grandmother", "Great Grandmother", "Aunt", "Mother"],
+        answer: "Great Grandmother",
+        explanation: "C is A's mother, D is her father, E is his mother → A's great-grandmother."
+      },
+      {
+        question: "16. X is the husband of Y. Z is the daughter of Y. How is X related to Z?",
+        options: ["Father", "Uncle", "Brother", "Cousin"],
+        answer: "Father",
+        explanation: "Husband of mother = father."
+      },
+      {
+        question: "17. A woman said, 'This man's son's sister is my mother.' How is the woman related to the man?",
+        options: ["Granddaughter", "Daughter", "Niece", "Sister"],
+        answer: "Granddaughter",
+        explanation: "Man's son's sister = man's daughter = woman's mother → woman is granddaughter."
+      },
+      {
+        question: "18. A is the sister of B. C is the husband of A. D is the brother of C. How is D related to B?",
+        options: ["Brother-in-law", "Cousin", "Father", "Uncle"],
+        answer: "Brother-in-law",
+        explanation: "D is husband's brother → brother-in-law of B."
+      },
+      {
+        question: "19. P is the daughter of Q, who is the only child of R. How is R related to P?",
+        options: ["Grandmother/Grandfather", "Uncle", "Aunt", "Sister"],
+        answer: "Grandmother/Grandfather",
+        explanation: "Q is R's only child, P is Q's daughter → R is grandparent."
+      },
+      {
+        question: "20. A man says, 'My mother-in-law's only daughter has a son. He is my son.' How is the man's wife related to the son?",
+        options: ["Mother", "Aunt", "Sister", "Grandmother"],
+        answer: "Mother",
+        explanation: "Mother-in-law's only daughter = wife; her son = their child → wife is mother."
+      }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+    const resultsDiv = document.getElementById("results");
+    const timerDisplay = document.getElementById("timer");
+    const progressFill = document.getElementById("progressFill");
+    const quizPage = document.getElementById("quizPage");
+    const resultsPage = document.getElementById("resultsPage");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    
+    let timeLeft = 20 * 60; // 20 minutes
+    let timerInterval;
+    let userAnswers = {};
+
+    function renderQuiz() {
+      quizForm.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement("div");
+        div.classList.add("question");
+        div.innerHTML = `
+          <div class="question-text">${q.question}</div>
+          <div class="options">
+            ${q.options.map((opt) => `
+              <label>
+                <input type="radio" name="q${index}" value="${opt}" />
+                ${opt}
+              </label>`).join("")}
+          </div>
+        `;
+        quizForm.appendChild(div);
+      });
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const answered = Object.keys(userAnswers).length;
+      const progress = (answered / questions.length) * 100;
+      progressFill.style.width = progress + '%';
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timeLeft = 20 * 60;
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const seconds = String(timeLeft % 60).padStart(2, '0');
+        timerDisplay.textContent = `⏱️ Time Left: ${minutes}:${seconds}`;
+        timeLeft--;
+      }, 1000);
+    }
+
+    document.addEventListener('change', function(e) {
+      if (e.target.type === 'radio') {
+        const questionIndex = e.target.name.replace('q', '');
+        userAnswers[questionIndex] = e.target.value;
+        updateProgress();
+      }
+    });
+
+    function submitQuiz() {
+      clearInterval(timerInterval);
+      
+      // Collect any remaining answers
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name=q${index}]:checked`);
+        if (selected && !userAnswers[index]) {
+          userAnswers[index] = selected.value;
+        }
+      });
+
+      hideAllPages();
+      resultsPage.classList.remove("hidden");
+      displayResults();
+    }
+
+    function displayResults() {
+      let score = 0;
+      let resultsHTML = "";
+
+      questions.forEach((q, index) => {
+        const userAns = userAnswers[index] || "Not Answered";
+        const correct = q.answer === userAns;
+        if (correct) score++;
+
+        resultsHTML += `
+          <div class="result-item ${correct ? 'correct' : 'incorrect'}">
+            <div class="question-text">${q.question}</div>
+            <p><strong>Your Answer:</strong> <span class="user-answer">${userAns}</span></p>
+            <p><strong>Correct Answer:</strong> <span class="correct-answer">${q.answer}</span></p>
+            <div class="explanation"><strong>Explanation:</strong> ${q.explanation}</div>
+          </div>
+        `;
+      });
+
+      const percentage = Math.round((score / questions.length) * 100);
+      let grade = "";
+      if (percentage >= 90) grade = "🏆 Excellent!";
+      else if (percentage >= 80) grade = "👍 Great Job!";
+      else if (percentage >= 70) grade = "🙂 Good Effort";
+      else if (percentage >= 60) grade = "😕 Needs Improvement";
+      else grade = "😞 Keep Practicing";
+
+      scoreDisplay.innerHTML = `${grade} Your Score: ${score}/${questions.length} (${percentage}%)`;
+      resultsDiv.innerHTML = resultsHTML;
+    }
+
+    function restartQuiz() {
+      userAnswers = {};
+      showQuiz();
+    }
+
+    function hideAllPages() {
+      quizPage.classList.add("hidden");
+      resultsPage.classList.add("hidden");
+    }
+
+    function showQuiz() {
+      hideAllPages();
+      quizPage.classList.remove("hidden");
+      renderQuiz();
+      startTimer();
+    }
+
+    // Initialize quiz
+    showQuiz();
+
+    // Background animation
+    const canvas = document.getElementById("backgroundCanvas");
+    const ctx = canvas.getContext("2d");
+    const formulas = ["π", "x+y", "E = mc²", "√x", "∑", "θ", "log(x)", "a²+b²=c²"];
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function initParticles() {
+      particles = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        text: formulas[Math.floor(Math.random() * formulas.length)],
+        speedY: 1 + Math.random() * 2,
+        size: 14 + Math.random() * 10,
+        opacity: 0.4 + Math.random() * 0.6
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        ctx.shadowColor = "#39ff14";
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = `rgba(57, 255, 20, ${p.opacity})`;
+        ctx.font = `${p.size}px monospace`;
+        ctx.fillText(p.text, p.x, p.y);
+
+        p.y += p.speedY;
+        if (p.y > canvas.height) {
+          p.y = 0;
+          p.x = Math.random() * canvas.width;
+          p.text = formulas[Math.floor(Math.random() * formulas.length)];
+        }
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", () => {
+      resizeCanvas();
+      initParticles();
+    });
+
+    resizeCanvas();
+    initParticles();
+    draw();
+  </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login Page</title>
+  <link rel="stylesheet" href="login.css" />
+  <style>
+    /* Toggle Switch Styling */
+    .role-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 34px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Sliding Panels */
+    .login-forms {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .form-panel {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+      transform: translateX(100%);
+    }
+
+    .form-panel.active-form {
+      opacity: 1;
+      transform: translateX(0);
+      position: relative;
+    }
+
+    #userForm.exit-left {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+
+  <div class="main-container">
+    <div class="left-panel">
+      <div class="title-container">
+        <div class="title">APTIX</div>
+        <h4>"A platform to learn Aptitude."</h4>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+        <div class="sparkle"></div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="login-container">
+        <h2>Login</h2>
+
+        <!-- Role Toggle Switch -->
+        <div class="role-toggle">
+          <span>User</span>
+          <label class="switch">
+            <input type="checkbox" id="roleToggle" onchange="updateRoleLabel()" />
+            <span class="slider"></span>
+          </label>
+          <span id="roleLabel">Admin</span>
+        </div>
+
+        <!-- Login Forms Container -->
+        <div class="login-forms">
+          <!-- User Form -->
+          <div id="userForm" class="form-panel active-form">
+            <div class="input-group">
+              <input type="text" id="username" required />
+              <label for="username">Username</label>
+            </div>
+
+            <div class="input-group">
+              <input type="password" id="password" required />
+              <label for="password">Password</label>
+              <span class="eye-icon" id="eye-icon" onclick="togglePassword()">👁️</span>
+            </div>
+
+            <button onclick="login()">Login</button>
+            <p id="error" class="error-msg"></p>
+            <p class="register-link">Don't have an account? <a href="register.html">Register</a></p>
+          </div>
+
+          <!-- Admin Form -->
+          <div id="adminForm" class="form-panel">
+            <div class="input-group">
+              <input type="text" id="adminUsername" required />
+              <label for="adminUsername">Admin Username</label>
+            </div>
+
+            <div class="input-group">
+              <input type="password" id="adminPassword" required />
+              <label for="adminPassword">Admin Password</label>
+            </div>
+
+            <button onclick="adminLogin()">Login as Admin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const passwordField = document.getElementById("password");
+      const eyeIcon = document.getElementById("eye-icon");
+      const isPassword = passwordField.type === "password";
+      passwordField.type = isPassword ? "text" : "password";
+      eyeIcon.textContent = isPassword ? "🙈" : "👁️";
+    }
+
+    function updateRoleLabel() {
+      const toggle = document.getElementById("roleToggle");
+      const label = document.getElementById("roleLabel");
+      label.textContent = toggle.checked ? "Admin" : "User";
+
+      const userForm = document.getElementById("userForm");
+      const adminForm = document.getElementById("adminForm");
+
+      if (toggle.checked) {
+        // Switch to Admin
+        userForm.classList.remove("active-form");
+        userForm.classList.add("exit-left");
+
+        setTimeout(() => {
+          userForm.classList.remove("exit-left");
+          adminForm.classList.add("active-form");
+        }, 500);
+      } else {
+        // Switch to User
+        adminForm.classList.remove("active-form");
+        adminForm.classList.add("exit-left");
+
+        setTimeout(() => {
+          adminForm.classList.remove("exit-left");
+          userForm.classList.add("active-form");
+        }, 500);
+      }
+    }
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const error = document.getElementById("error");
+
+      // Clear any previous error message
+      error.textContent = "";
+
+      // Allow any username and password to log in for testing purposes
+      console.log("Logging in with username:", username, "and password:", password);
+      window.location.href = "home.html"; // Redirect to home page
+    }
+
+    function adminLogin() {
+      const username = document.getElementById("adminUsername").value.trim();
+      const password = document.getElementById("adminPassword").value.trim();
+
+      // Allow any username and password to log in for testing purposes
+      console.log("Logging in as admin with username:", username, "and password:", password);
+      window.location.href = "home.html"; // Redirect to home page
+    }
+  </script>
+
+  <script src="login.js"></script>
+</body>
+</html>
